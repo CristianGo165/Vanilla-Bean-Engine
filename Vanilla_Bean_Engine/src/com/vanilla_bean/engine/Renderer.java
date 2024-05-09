@@ -9,6 +9,7 @@ import com.vanilla_bean.engine.gfx.ImageTile;
 public class Renderer {
 	private int pixelWidth, pixelHeight;
 	private int[] pixel;
+	private int[] layer;
 	private Font font = Font.STANDARD;
 
 	public Renderer(GameContainer gc) {
@@ -26,7 +27,14 @@ public class Renderer {
 	}
 	
 	public void setPixel(int x, int y, int value) {
-		if((x < 0 || x>= pixelWidth || y < 0 || y >= pixelHeight)) {
+		//System.out.println(Integer.toHexString(value));
+		//System.out.println(pixel[x + y * pixelWidth]);
+		int alphaA = ((value >> 24) & 0xff);
+		int alphaB = ((pixel[x + y * pixelWidth] >> 24) & 0xff);
+		System.out.println("New Alpha: " + alphaA);
+		System.out.println("Old Alpha: " + alphaB);
+
+		if((x < 0 || x>= pixelWidth || y < 0 || y >= pixelHeight || alphaA == 0)) {
 			return;
 		}
 		

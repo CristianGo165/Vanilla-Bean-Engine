@@ -171,12 +171,12 @@ public class GameContainer implements Runnable {
 			}
 
 			if (render) {
-				//renderer.clear();
+				renderer.clearAllLayers();
 				aGame.render(this, renderer);
+				//renderer.compositeLayers();
 				//renderer.drawText("FPS: " + fps, 0, 10, 0xff00ffff);
 				window.update();
 				frames++;
-
 			} else {
 				try {
 					Thread.sleep(1);

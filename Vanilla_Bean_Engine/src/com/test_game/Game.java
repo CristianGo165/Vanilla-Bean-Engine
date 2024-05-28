@@ -311,47 +311,52 @@ public class Game extends AbstractGame{
 				for(int y = 0; y < (board.COL_COUNT * 16) ; y+= 16) {
 					
 					if(board.getBoard()[x/16][y/16].getTypeCell() == CellType.SPACE) {
-						renderer.drawImageTile(image, x + boardOffset, y + boardOffset, 1, 1);
+						renderer.drawImageTile(image, x + boardOffset, y + boardOffset, 1, 1, 0);
 					}
 					if(board.getBoard()[x/16][y/16].getTypeCell() == CellType.FOOD) {
-						renderer.drawImageTile(image, x + boardOffset, y + boardOffset, 2, 0);
+						renderer.drawImageTile(image, x + boardOffset, y + boardOffset, 2, 0, 0);
 					}
 					if(board.getBoard()[x/16][y/16].getTypeCell() == CellType.SNAKE_BODY){
-						renderer.drawImageTile(image, x + boardOffset, y + boardOffset, 0, 0);
+						renderer.drawImageTile(image, x + boardOffset, y + boardOffset, 0, 0, 0);
 					}
 					if(board.getBoard()[x/16][y/16].getTypeCell() == CellType.WALL){
-						renderer.drawImageTile(image, x + boardOffset, y + boardOffset, 2, 1);
+						renderer.drawImageTile(image, x + boardOffset, y + boardOffset, 2, 1, 0);
 					}
 				}
 			}
 						
 			for(int i = 0 ; i < player.getPlayerLives(); i++) {
-				renderer.drawImageTile(image, 136 + i*16, 0, 2, 3);
+				renderer.drawImageTile(image, 136 + i*16, 0, 2, 3, 0);
 			}
 			
-			renderer.drawText("Score: " + player.getPlayerScore(), 250, 0, 0xffffffff);
-			renderer.drawText("Player: " + player.getPlayerName(), 0, 0, 0xffffffff);
+			renderer.drawText("Score: " + player.getPlayerScore(), 250, 0, 0xffffffff, 0);
+			renderer.drawText("Player: " + player.getPlayerName(), 0, 0, 0xffffffff, 0);
 			
-			renderer.drawText("Move: WASD/ARROW KEYS", 0, 310, 0xffffffff);
-			renderer.drawText("Mute Music: M", 100, 310, 0xffffffff);
-			renderer.drawText("Restart Game: R", 175, 310, 0xffffffff);
-			renderer.drawText("Quit Game: ESC", 250, 310, 0xffffffff);
+			renderer.drawText("Move: WASD/ARROW KEYS", 0, 310, 0xffffffff, 0);
+			renderer.drawText("Mute Music: M", 100, 310, 0xffffffff, 0);
+			renderer.drawText("Restart Game: R", 175, 310, 0xffffffff, 0);
+			renderer.drawText("Quit Game: ESC", 250, 310, 0xffffffff, 0);
 		}		
 		else {
-			renderer.drawText("Java Snake Game", 160 - renderer.getTextWidth("Java Snake Game"), 50, 0xffffffff);
-			renderer.drawText("Press L to load previous save", 160 - renderer.getTextWidth("Press L to load previous save"), 160, 0xffffffff);
-			renderer.drawText("Press Shift to load new save", 160 - renderer.getTextWidth("Press Shift to load new save"), 170, 0xffffffff);
-			renderer.drawText("Player Name: " + player.getPlayerName(), 160 - renderer.getTextWidth("Player Name: " + player.getPlayerName()), 190, 0xffffffff);
-			renderer.drawText("High Scores: ", 160 - renderer.getTextWidth("High Scores: "), 200, 0xffffffff);
+			renderer.drawText("Java Snake Game", 160 - renderer.getTextWidth("Java Snake Game"), 50, 0xffffffff, 0);
+			renderer.drawText("Press L to load previous save", 160 - renderer.getTextWidth("Press L to load previous save"), 160, 0xffffffff, 0);
+			renderer.drawText("Press Shift to load new save", 160 - renderer.getTextWidth("Press Shift to load new save"), 170, 0xffffffff, 0);
+			renderer.drawText("Player Name: " + player.getPlayerName(), 160 - renderer.getTextWidth("Player Name: " + player.getPlayerName()), 190, 0xffffffff, 0);
+			renderer.drawText("High Scores: ", 160 - renderer.getTextWidth("High Scores: "), 200, 0xffffffff, 0);
 			for(int i = 0 ; i < 3 ; i++) {
-				renderer.drawText(Integer.toString(player.getTopScores()[i]), 160 - renderer.getTextWidth(Integer.toString(player.getTopScores()[i])), (200 + (10*(i + 1))), 0xffffffff);
+				renderer.drawText(Integer.toString(player.getTopScores()[i]), 160 - renderer.getTextWidth(Integer.toString(player.getTopScores()[i])), (200 + (10*(i + 1))), 0xffffffff, 0);
 			}
-			renderer.drawText("Score Sum: " + player.getScoreSum(), 160 - renderer.getTextWidth("Score Sum: " + player.getScoreSum()), 240, 0xffffffff);
+			renderer.drawText("Score Sum: " + player.getScoreSum(), 160 - renderer.getTextWidth("Score Sum: " + player.getScoreSum()), 240, 0xffffffff, 0);
 		}
 
 		if(returnIsGameOver()){
-			renderer.drawText("Game Over :(", 160 - renderer.getTextWidth("Game Over :("), 160, 0xffffffff);
+			renderer.drawText("Game Over :(", 160 - renderer.getTextWidth("Game Over :("), 160, 0xffffffff, 0);
 		}
+		
+		renderer.addLayer(1);
+		
+		renderer.drawImageTile(image, gc.getInput().getMouseX(), gc.getInput().getMouseY(), 3, 3, 1);
+		
 		//Draw Code
 	}
 }

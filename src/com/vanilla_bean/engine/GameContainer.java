@@ -4,30 +4,37 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
+import java.awt.DisplayMode;
+
 //import java.awt.event.KeyEvent;
 //import java.awt.event.MouseEvent;
 
 public class GameContainer implements Runnable {
+	
+	private DisplayMode display;
 
 	private Thread thread;
+
 	private boolean running = false;
-	private final double UPDATE_LIMIT = 1.0 /10.0;
+	private final double UPDATE_LIMIT = 1.0 / 10.0;
+	//private final double RENDERING_LIMIT = 1.0 / display.getRefreshRate();
+	//System.out.println(display.getRefreshRate);
 
 	// Window Variables
 	private int width = 320, height = 320;
 	private float scale = 2;
-	//Current Vanilla Bean Version (NOTE: SHOULD BE UPDATED)
+	// Current Vanilla Bean Version (NOTE: SHOULD BE UPDATED)
 	private String title = "Vanilla Bean Engine V0.1";
-	//Current Vanilla Bean Version (NOTE: SHOULD BE UPDATED)
+	// Current Vanilla Bean Version (NOTE: SHOULD BE UPDATED)
 	// Window Variables
 
 	// Window Setup
 	private Window window;
 	// Window Setup
-	
-	//Player name field setup
+
+	// Player name field setup
 	private TextField textField;
-	//Player name field setup;
+	// Player name field setup;
 
 	// Renderer Setup
 	private Renderer renderer;
@@ -40,15 +47,15 @@ public class GameContainer implements Runnable {
 	// Abstract Game Setup
 	private AbstractGame aGame;
 	// Abstract Game Setup
-	
-	//Setup Icon
+
+	// Setup Icon
 	private java.awt.Image logo;
-	//Setup Icon
+	// Setup Icon
 
 	public Window getWindow() {
 		return window;
 	}
-	
+
 	public TextField getTextField() {
 		return this.textField;
 	}
@@ -85,7 +92,7 @@ public class GameContainer implements Runnable {
 		this.title = title;
 		getWindow().getFrame().setTitle(this.title);
 	}
-	
+
 	public void setWindowIcon(String path) {
 		try {
 			logo = ImageIO.read(GameContainer.class.getResourceAsStream(path));
@@ -104,22 +111,22 @@ public class GameContainer implements Runnable {
 	}
 
 	public void startProgram() {
-		
+
 		window = new Window(this);
-		
-		//Standard Logo
+
+		// Standard Logo
 		setWindowIcon("/images/vanilla_bean/Vanilla Bean Logo Prototype.png");
-		//Standard Logo
+		// Standard Logo
 
 		renderer = new Renderer(this);
-		
+
 		textField = new TextField();
 
 		input = new Input(this);
 
 		thread = new Thread(this);
-		
-		thread.run();
+
+		thread.start();
 	}
 
 	public void stop() {
@@ -134,18 +141,17 @@ public class GameContainer implements Runnable {
 		double lastTime = System.nanoTime() / 1000000000.0;
 		double passedTime = 0;
 		double unprocessedTime = 0;
-		boolean render = false;
+		boolean render = true;
 
 		double frameTime = 0;
 		int frames = 0;
 		int fps = 0;
-		
-		System.out.println("Start Ran");
+
 		aGame.start(this, (float) UPDATE_LIMIT);
 
 		while (running) {
 
-			render = false;
+			render = true;
 
 			firstTime = System.nanoTime() / 1000000000.0;
 			passedTime = firstTime - lastTime;
@@ -171,13 +177,16 @@ public class GameContainer implements Runnable {
 			}
 
 			if (render) {
+				renderer.clearAllLayers();
 
-				renderer.clear();
 				aGame.render(this, renderer);
-				//renderer.drawText("FPS: " + fps, 0, 10, 0xff00ffff);
+
+				renderer.compositeLayers();
+
+				// renderer.drawText("FPS: " + fps, 0, 10, 0xff00ffff);
+				System.out.println(fps);
 				window.update();
 				frames++;
-
 			} else {
 				try {
 					Thread.sleep(1);

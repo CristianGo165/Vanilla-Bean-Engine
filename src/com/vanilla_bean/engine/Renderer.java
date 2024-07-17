@@ -2,42 +2,96 @@ package com.vanilla_bean.engine;
 
 import java.awt.image.DataBufferInt;
 
+import java.util.ArrayList;
+
 import com.vanilla_bean.engine.gfx.Font;
 import com.vanilla_bean.engine.gfx.Image;
 import com.vanilla_bean.engine.gfx.ImageTile;
+import com.vanilla_bean.engine.gfx.Layer;
 
 public class Renderer {
 	private int pixelWidth, pixelHeight;
-	private int[] pixel;
+	private Compositor compositor;
+	private Layer outputLayer = new Layer();
+	private ArrayList<Layer> layers = new ArrayList<Layer>();
 	private Font font = Font.STANDARD;
 
 	public Renderer(GameContainer gc) {
 		pixelWidth = gc.getWidth();
 		pixelHeight = gc.getHeight();
-
-		// Edits Pixel Data of Image Being Rendered
-		pixel = ((DataBufferInt) gc.getWindow().getImage().getRaster().getDataBuffer()).getData();
-	}
-
-	public void clear() {
-		for (int i = 0; i < pixel.length; i++) {
-			pixel[i] = 0;
-		}
-	}
-	
-	public void setPixel(int x, int y, int value) {
-		if((x < 0 || x>= pixelWidth || y < 0 || y >= pixelHeight)) {
-			return;
+		
+		compositor = new Compositor();
+		
+		outputLayer = new Layer();
+		
+		layers = new ArrayList<Layer>();
+		
+		//Background
+		layers.add(new Layer());
+		for (int i = 0; i < layers.get(0).getPixels().length; i++) {
+			layers.get(0).getPixels()[i] = 0xff000000;
 		}
 		
-		pixel[x + y * pixelWidth] = value;
+		//Tiles 1
+		layers.add(new Layer());
+		
+		//Text
+		layers.add(new Layer());
+		
+		//Cursor
+		layers.add(new Layer());
+		
+
+		// Edits Pixel Data of Image Being Rendered
+		outputLayer.setPixels(((DataBufferInt) gc.getWindow().getImage().getRaster().getDataBuffer()).getData());
 	}
 	
-	public void drawText(String text, int offsetX, int offsetY, int color) {
+	public void compositeLayers() {
+		Layer composite = compositor.blendAllLayers(this.layers);
+		for(int i = 0 ; i < outputLayer.getPixels().length ; i++) {
+			outputLayer.getPixels()[i] = composite.getPixels()[i];
+		}
+	}
+	
+	public void clearLayerOut() {
+		for (int i = 0; i < outputLayer.getPixels().length; i++) {
+			outputLayer.getPixels()[i] = 0xffff0000;
+		}
+	}
+
+	public void clearAllLayers() {
+		//clearLayerOut();
+		for(Layer layer : layers) {
+			layer.clearLayer();
+		}
+	}
+	
+	public ArrayList<Layer> getLayers(){
+		return this.layers;
+	}
+	
+	public void setPixel(int x, int y, int value, int layer) {
+		
+		//int alpha = ((value >> 24) & 0xff);		
+
+		if((x < 0 || x>= pixelWidth || y < 0 || y >= pixelHeight || ((value >> 24) & 0xff) == 0)) {
+			return;
+		}
+		if(((value >> 24) & 0xff) == 0) {
+			//layers.get(layer).getPixels()[x + y * pixelWidth] = 0x00000000;
+			return;
+		}
+		layers.get(layer).getPixels()[x + y * pixelWidth] = value;
+	}
+	
+	public void addLayer() {
+		layers.add(new Layer());
+	}
+	
+	public void drawText(String text, int offsetX, int offsetY, int color, int layer) {
 		//Only for fonts with only upper case
 		
 		//Image fontImage = font.getFontImage();
-		
 		text = text.toUpperCase();
 		
 		int offset = 0;
@@ -48,7 +102,7 @@ public class Renderer {
 			for(int y = 0; y < font.getFontImage().getHeight(); y++) {
 				for(int x = 0; x < font.getWidths()[unicode]; x++) {
 					if(font.getFontImage().getPixel()[(x + font.getOffsets()[unicode])+y*font.getFontImage().getWidth()] == 0xffffffff) {
-						setPixel(x+ offsetX + offset, y + offsetY, color);
+						setPixel(x+ offsetX + offset, y + offsetY, color, layer);
 					}
 				}
 			}
@@ -69,7 +123,7 @@ public class Renderer {
 		return offsetTotal/2;
 	}
 
-	public void drawImage(Image image, int offsetX, int offsetY) {
+	public void drawImage(Image image, int offsetX, int offsetY, int layer) {
 		
 		//Don't Render
 		if(offsetX < -image.getWidth()) return;
@@ -107,12 +161,12 @@ public class Renderer {
 		
 		for(int y = newY ; y < newHeight; y++) {
 			for(int x = newX; x < newWidth; x++) {
-				setPixel(x + offsetX, y + offsetY, image.getPixel()[x + y * image.getWidth()]);
+				setPixel(x + offsetX, y + offsetY, image.getPixel()[x + y * image.getWidth()], layer);
 			}
 		}
 	}
 	
-	public void drawImageTile(ImageTile image, int offsetX, int offsetY, int tileX, int tileY) {
+	public void drawImageTile(ImageTile image, int offsetX, int offsetY, int tileX, int tileY, int layer) {
 
 		//Don't Render
 		if(offsetX < -image.getTileWidth()) return;
@@ -150,7 +204,7 @@ public class Renderer {
 		
 		for(int y = newY ; y < newHeight; y++) {
 			for(int x = newX; x < newWidth; x++) {
-				setPixel(x + offsetX, y + offsetY, image.getPixel()[(x + tileX * image.getTileWidth()) + (y + tileY * image.getTileHeight()) * image.getWidth()]);
+				setPixel(x + offsetX, y + offsetY, image.getPixel()[(x + tileX * image.getTileWidth()) + (y + tileY * image.getTileHeight()) * image.getWidth()], layer);
 			}
 		}
 	}

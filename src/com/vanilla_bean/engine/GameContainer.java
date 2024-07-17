@@ -16,7 +16,7 @@ public class GameContainer implements Runnable {
 	private Thread thread;
 
 	private boolean running = false;
-	private final double UPDATE_LIMIT = 1.0 / 60.0;
+	private final double UPDATE_LIMIT = 1.0 / 10.0;
 	//private final double RENDERING_LIMIT = 1.0 / display.getRefreshRate();
 	//System.out.println(display.getRefreshRate);
 
